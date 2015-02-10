@@ -40,14 +40,115 @@ Also each field is assigned an id equal to the fieldAttribute so individual fiel
 
 <polymer-element name="ra-form-layout">
     <style>
-        body /deep/ core-menu {
-            box-sizing: border-box;
-            width: 200px;
-            overflow-x: hidden;
-            margin: 2px;
-        }
+
+
     </style>
     <template>
+        <style>
+/*            ra-form-layout /deep/ .ra-group-box-ace {
+                border-style:dotted;
+                border-width:1px;
+                border-color: green;
+                margin:5px;
+                padding:5px 20px;
+                width: 100%;
+            }*/
+
+            /* TODO Якобы для выпадающего списка, проверить! */
+            body /deep/ core-menu {
+                box-sizing: border-box;
+                width: 200px;
+                overflow-x: hidden;
+                margin: 2px;
+            }
+            /*note the class ra-group-box is assign to the containing div for each field group*/
+            .ra-group-box {
+                border-style:dotted;
+                border-width:1px;
+                border-color: green;
+                margin:5px;
+                padding:5px 20px;
+                width: 92%;
+            }
+            /*note the class ra-field-box is assign to the containing div for each field*/
+            .ra-field-box {
+                border-style:dotted;
+                border-width:1px;
+                margin:5px;
+                padding:5px 20px;
+                width: 220px;
+            }
+
+            /*note the element assigns an id EQUAL!!! to the fieldAttribute value to the containing div for each
+            field so each field can be styled individually.
+            */
+
+            #slider {
+                background-color: grey;
+                width:400px;
+            }
+
+            /* TODO Проверить, нафига? */
+            paper-input-decorator {
+                padding: 0px;
+            }
+            /* TODO Проверить, нафига? */
+            p {
+                margin: 0px;
+            }
+
+            /* Paper dropdowm menu stuff */
+            section {
+                padding: 20px 0;
+            }
+
+            section > div {
+                padding: 14px;
+                font-size: 16px;
+            }
+
+            html /deep/ paper-dropdown-menu {
+                box-sizing: border-box;
+                width: 170px;
+            }
+
+            html /deep/ core-menu {
+                box-sizing: border-box;
+                width: 200px;
+            }
+
+html /deep/            paper-item {
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+            }
+
+            html /deep/ core-collapse {
+                border: 1px solid #ccc;
+                padding: 8px;
+            }
+
+            html /deep/ core-overlay {
+                border: 1px solid #ccc;
+                padding: 8px;
+                background: #fff;
+            }
+
+html /deep/ .constrained-height {
+                height: 150px;
+            }
+
+html /deep/            .colored {
+                color: #0f9d58;
+            }
+
+            html /deep/ .dropdown.colored::shadow #ripple,
+            html /deep/ .dropdown.colored::shadow #background {
+                border: 1px solid #0f9d58;
+                background-color: #b7e1cd;
+            }
+
+        </style>
         <div id='container'>
             <template repeat="{{formGroup, i in formItems}}">
                 <div class='ra-group-box' layout horizontal justified center wrap>
@@ -86,23 +187,38 @@ Also each field is assigned an id equal to the fieldAttribute so individual fiel
                         <!-- ======================= DROPDOWN FIELD ======================================================== -->
                         <template if="{{fieldInfo.useControl==='dropdown'}}">
                             <div layout horizontal justified center class='ra-field-box' id="{{fieldInfo.fieldAttribute}}">
-                                <p>{{fieldInfo.fieldLabel}}</p>
+                                <!--<p>{{fieldInfo.fieldLabel}}</p>-->
 
-                                <div style='width:10px;'></div>
-                                <paper-dropdown-menu label="{{fieldInfo.value}}">
-                                    <paper-dropdown layered="true" class="dropdown"> <!--relatedTarget="{{$[fieldInfo.fieldAttribute] | debug}}-->
-                                        <core-menu  class="menu" on-core-select="{{updateFormValues}}" valueattr="sel"  selected="{{fieldInfo.value}}"> <!--style="box-sizing: border-box; width: 220px; overflow-x: hidden;"-->
-                                            <template repeat="{{fieldInfo.selectvalues}}">
-                                                <paper-item sel="{{}}">{{}}</paper-item>
-                                            </template>
-                                        </core-menu>
-                                    </paper-dropdown>
-                                </paper-dropdown-menu>
+                                <!--<div style='width:10px;'></div>-->
+
+                                <div vertical layout>
+                                    <div class="label-text">{{fieldInfo.fieldLabel}}</div>
+                                    <div>
+                                        <paper-dropdown-menu label="{{fieldInfo.value}}">
+                                            <paper-dropdown class="dropdown">
+                                                <!--relatedTarget="{{$[fieldInfo.fieldAttribute] | debug}}-->
+                                                <core-menu class="menu" on-core-select="{{updateFormValues}}"
+                                                           valueattr="sel" selected="{{fieldInfo.value}}">
+                                                    <!--style="box-sizing: border-box; width: 220px; overflow-x: hidden;"-->
+                                                    <template repeat="{{fieldInfo.selectvalues}}">
+                                                        <paper-item sel="{{}}">{{}}</paper-item>
+                                                    </template>
+                                                </core-menu>
+                                            </paper-dropdown>
+                                        </paper-dropdown-menu>
+                                    </div>
+                                </div>
+
                             </div>
                         </template>
                         <template id="ace_tmpl"  if="{{fieldInfo.useControl==='ace'}}">
                             <div layout horizontal justified center class='ra-group-box-ace' id="{{fieldInfo.fieldAttribute}}">
-                                <ace-element  on-editor-input="{{aceFired}}" theme="chrome" mode="json" tabSize="2" fontSize="16px" value="{{fieldInfo.value}}">{{fieldInfo.value}}</ace-element>
+                                <div vertical layout>
+                                <div class="label-text" ">{{fieldInfo.fieldLabel}}</div>
+                                <div>
+                                    <ace-element  on-editor-input="{{aceFired}}" theme="chrome" mode="json" tabSize="2" fontSize="16px" value="{{fieldInfo.value}}">{{fieldInfo.value}}</ace-element>
+                                </div>
+                                </div>
                             </div>
                         </template>
                     </template>

@@ -15,66 +15,9 @@
 <link rel="import" href="../ra-elements/ra-crud-buttons.html">
 <link rel="import" href="../ra-elements/ra-dashboard.html">
 
-<polymer-element name="ra-basic-layout" attributes="selectedSub formValues">
+<polymer-element name="ra-basic-layout" attributes="selectedSub formValues formBuilder dashboardLoad">
     <template>
-        <style>
-            /*note the class ra-group-box is assign to the containing div for each field group*/
-            /* ra-form-layout css */
-            ra-form-layout /deep/ .ra-group-box {
-                border-style:dotted;
-                border-width:1px;
-                border-color: green;
-                margin:5px;
-                padding:5px 20px;
-                width: 92%;
-            }
-
-            ra-form-layout /deep/ .ra-group-box-ace {
-                border-style:dotted;
-                border-width:1px;
-                border-color: green;
-                margin:5px;
-                padding:5px 20px;
-                width: 100%;
-            }
-            /*note the class ra-field-box is assign to the containing div for each field*/
-
-            ra-form-layout /deep/ .ra-field-box {
-                border-style:dotted;
-                border-width:1px;
-                margin:5px;
-                padding:5px 20px;
-                width: 200px;
-            }
-
-            /*note the element assigns an id equal to the fieldAttribute value to the containing div for each
-            field so each field can be styled individually.
-            */
-
-            ra-form-layout /deep/ #slider {
-                background-color: grey;
-                width:400px;
-            }
-
-            ra-form-layout /deep/ paper-input-decorator {
-                padding: 0px;
-            }
-
-            ra-form-layout /deep/ p {
-                margin: 0px;
-            }
-
-            ra-form-layout /deep/ paper-dropdown-menu {
-                margin: 0px;
-            }
-
-
-            paper-item {
-                overflow: hidden;
-                white-space: nowrap;
-                text-overflow: ellipsis;
-            }
-
+<!--        <style>
             html /deep/ core-collapse {
                 border: 1px solid #ccc;
                 padding: 8px;
@@ -95,19 +38,19 @@
                 border: 1px solid #0f9d58;
                 background-color: #b7e1cd;
             }
-
             /* ra-form-layout end css */
-        </style>
+        </style>-->
+
         <template if="{{isLogged}}">
             <core-scaffold>
                 <core-header-panel mode="seamed" navigation flex>
-                    <core-toolbar>
+                    <core-toolbar style="background-color: #526E9C; color: #fff;">
                         <paper-button class="colored ra" id="logout" on-click="{{logoutAction}}">
                             <core-icon icon="exit-to-app"></core-icon>
                             Выйти
                         </paper-button>
                     </core-toolbar>
-                    <!-- ================================================= MAIN MENU =========================================================================== -->
+                    <!-- ================================== MAIN MENU ============================================= -->
                     <!-- <paper-shadow z="1"> -->
                     <core-menu selected="{{mainMenuSelected}}" selectedIndex="{{mainMenuSelectedIndex}}">
                         <!-- ============================== DASHBOARD MENU ======================================== -->
@@ -127,29 +70,30 @@
                     Rationale
                 </div>
                 <!-- =================================================== DASHBOARD ============================================================================ -->
-<!--                    <template if="mainMenuSelectedIndex === 0}}">
+                    <template if="{{mainMenuSelectedIndex === 0}}">
                         <ra-form-layout
                                 formItems="{{dashboardLoad()}}" formValues="{{formValues}}">
                         </ra-form-layout>
                         <ra-crud-buttons
                                 updateonly="{{true}}" onaction="{{crudAction}}" collection="dashboard">
                         </ra-crud-buttons>
-                    </template>-->
-                <!-- =================================================== PLAYERS, SUITES, DESIGNS ============================================================= -->
-<!--                <template if="isAdmin">-->
-                    <template bind="{{mainMenuSelectedIndex as i}}">
-                      <div>{{i -1 | debug}}</div>
-                        <ra-form-layout
-                            formItems="{{menus[i].content[selectedSub] | formBuilder(menus[i].name)}}" formValues="{{formValues}}">
-                        </ra-form-layout>
-<!--                        &lt;!&ndash;TODO get values from form with filter!!!&ndash;&gt;
-                        <ra-crud-buttons
-                            onaction="{{crudAction}}"
-                            collection="{{m.name}}"
-                            elementid="{{m.content[selectedSub]._id}}">
-                        </ra-crud-buttons> -->
                     </template>
-<!--                </template>-->
+                <!-- =================================================== PLAYERS, SUITES, DESIGNS ============================================================= -->
+                <template if="{{isAdmin}}">
+                    <template bind="{{menus[mainMenuSelectedIndex-1] as m}}">
+                        <template if="{{m.content[selectedSub].name}}">
+                            <ra-form-layout
+                                    formItems="{{m.content[selectedSub] | formBuilder(m.name)}}" formValues="{{formValues}}">
+                            </ra-form-layout>
+                            <!--TODO get values from form with filter!!!-->
+                            <ra-crud-buttons
+                                    onaction="{{crudAction}}"
+                                    collection="{{m.name}}"
+                                    elementid="{{m.content[selectedSub]._id}}">
+                            </ra-crud-buttons>
+                        </template>
+                    </template>
+                </template>
             </core-scaffold>
         </template>
         <template if="{{!isLogged}}">
@@ -159,8 +103,9 @@
         </template>
     </template>
     <script>
-        PolymerExpressions.prototype.debug = function(input) {
-            console.log("Polymer debug filter:", input)
+        PolymerExpressions.prototype.debug = function(input, arg) {
+            var s = "color: blue; font-size: 12px;";
+            console.log("%cPOLYMER DEBUG FILTER. Input: " + input +" Argument: " + arg, s)
             return input;
         };
 
