@@ -1,0 +1,13 @@
+<link rel="import" href="../ra-elements/ra-form-layout.html">
+<link rel="import" href="../ra-elements/ra-crud-buttons.html">
+
+<polymer-element name="ra-dashboard" attributes="formBuilder" noscript>
+    <template>
+        <ra-form-layout
+                formItems="{{menus[mainMenuSelectedIndex].name | formBuilder(menus[mainMenuSelectedIndex].name)}}" formValues="{{formValues}}">
+        </ra-form-layout>
+        <ra-crud-buttons
+                updateonly="{{true}}" onaction="{{crudAction}}" collection="dashboard">
+        </ra-crud-buttons>
+    </template>
+</polymer-element>

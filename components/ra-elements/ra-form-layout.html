@@ -39,6 +39,14 @@ Also each field is assigned an id equal to the fieldAttribute so individual fiel
 -->
 
 <polymer-element name="ra-form-layout">
+    <style>
+        body /deep/ core-menu {
+            box-sizing: border-box;
+            width: 200px;
+            overflow-x: hidden;
+            margin: 2px;
+        }
+    </style>
     <template>
         <div id='container'>
             <template repeat="{{formGroup, i in formItems}}">
@@ -75,14 +83,15 @@ Also each field is assigned an id equal to the fieldAttribute so individual fiel
                                 </paper-slider>
                             </div>
                         </template>
+                        <!-- ======================= DROPDOWN FIELD ======================================================== -->
                         <template if="{{fieldInfo.useControl==='dropdown'}}">
                             <div layout horizontal justified center class='ra-field-box' id="{{fieldInfo.fieldAttribute}}">
                                 <p>{{fieldInfo.fieldLabel}}</p>
 
                                 <div style='width:10px;'></div>
-                                <paper-dropdown-menu label="{{fieldInfo.fieldLabel}}">
-                                    <paper-dropdown class="dropdown">
-                                        <core-menu class="menu" on-core-select="{{updateFormValues}}" valueattr="sel"  selected="{{fieldInfo.value}}">
+                                <paper-dropdown-menu label="{{fieldInfo.value}}">
+                                    <paper-dropdown layered="true" class="dropdown"> <!--relatedTarget="{{$[fieldInfo.fieldAttribute] | debug}}-->
+                                        <core-menu  class="menu" on-core-select="{{updateFormValues}}" valueattr="sel"  selected="{{fieldInfo.value}}"> <!--style="box-sizing: border-box; width: 220px; overflow-x: hidden;"-->
                                             <template repeat="{{fieldInfo.selectvalues}}">
                                                 <paper-item sel="{{}}">{{}}</paper-item>
                                             </template>
@@ -103,6 +112,7 @@ Also each field is assigned an id equal to the fieldAttribute so individual fiel
     </template>
     <script>
         Polymer({
+            debug: function (a) {console.log("PolyDebug:", a); return a},
             formItems: [],
             formMap: {},
             publish: {
@@ -149,6 +159,7 @@ Also each field is assigned an id equal to the fieldAttribute so individual fiel
             }, // end loadFormItems
 
             updateFormValues: function () {
+                this.formValues = {};
                 for (var i = 0; i < this.formItems.length; ++i) {
                     for (var j = 0; j < this.formItems[i].length; ++j) {
                         this.formMap[this.formItems[i][j].fieldAttribute] = {};
