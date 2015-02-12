@@ -10,12 +10,13 @@
 <link rel="import" href="../core-menu/core-submenu.html">
 <link rel="import" href="../paper-item/paper-item.html">
 <link rel="import" href="../paper-button/paper-button.html">
+<link rel="import" href="../paper-toast/paper-toast.html">
 <link rel="import" href="../ra-elements/ra-login-box.html">
 <link rel="import" href="../ra-elements/ra-form-layout.html">
 <link rel="import" href="../ra-elements/ra-crud-buttons.html">
 <link rel="import" href="../ra-elements/ra-dashboard.html">
 
-<polymer-element name="ra-basic-layout" attributes="selectedSub formValues formBuilder dashboardLoad">
+<polymer-element name="ra-basic-layout" attributes="selectedSub formValues formBuilder dashboardLoad raErrorMessage">
     <template>
 <!--        <style>
             html /deep/ core-collapse {
@@ -56,12 +57,16 @@
                         <!-- ============================== DASHBOARD MENU ======================================== -->
                         <core-submenu id="dashboard" icon="assessment" label="DASHBOARD"></core-submenu>
                         <!-- =============================  PLAYERS, SUITES, etc. MENU ============================ -->
-                        <template repeat="{{menu in menus}}">
-                            <core-submenu id="{{menu.name}}_submenu" selected="{{selectedSub}}" selectedIndex="{{selectedSubIndex}}" icon="{{menu.icon}}" label="{{menu.display}}">
-                                <template repeat="{{ m_item in menu.content }}">
-                                    <paper-item>{{m_item.name}}</paper-item>
-                                </template>
-                            </core-submenu>
+                        <template if="{{isAdmin}}">
+                            <template repeat="{{menu in menus}}">
+                                <core-submenu id="{{menu.name}}_submenu" selected="{{selectedSub}}"
+                                              selectedIndex="{{selectedSubIndex}}" icon="{{menu.icon}}"
+                                              label="{{menu.display}}">
+                                    <template repeat="{{ m_item in menu.content }}">
+                                        <paper-item>{{m_item.name}}</paper-item>
+                                    </template>
+                                </core-submenu>
+                            </template>
                         </template>
                     </core-menu>
                     <!-- </paper-shadow> -->
@@ -94,6 +99,7 @@
                         </template>
                     </template>
                 </template>
+                <paper-toast id="ra_error" text="{{raErrorMessage}}" style="padding-right: 60px;"></paper-toast>
             </core-scaffold>
         </template>
         <template if="{{!isLogged}}">
@@ -128,6 +134,31 @@
                 var coll = e.target.attributes['data-collection'].value;
                 this.fire('crud-action', {action: action, collection: coll, obj: ra.formValues, elementid: elementid});
                 ra.formValues = {};
+            },
+            /* raError(string, [colors], [duration])
+             string = "error"
+             OR
+             string = "error,suberror"
+             default colors:
+             colors = "black,white,red" // background, error, suberror
+             default duration:
+             duration = 5000 // 5 secs
+             */
+            raError: function (err_string, err_colors, err_duration){
+                var to = document.querySelector('body /deep/ #ra_error')
+                var errs = err_string.split(",");
+                var colors = [];
+                err_colors ? colors = err_colors.split(",") : colors = ["black", "white", "red"];
+                if (errs.length < 2) { errs[1] = err_string[0]; errs[0] = "ERROR:"};
+                var template = function(str, coll){return str.replace(/{[^{}]+}/g, function(key){return coll[key.replace(/[{}]+/g, "")] || "";});}
+                to.style.color=colors[1];
+                to.style.backgroundColor=colors[0];
+                err_duration ? to.duration = err_duration : to.duration=5000;
+                to.text=errs[0];
+                var tmpl = "<div style='color: {color};'><b>{content}</b></div>";
+                var props = {color: colors[2], content: errs[1]};
+                to.innerHTML = template(tmpl, props);
+                to.show()
             },
 
             formBuilder: function (content, table) {
@@ -205,17 +236,18 @@
                 };
                 dashboardLayoutTmpl[1]=[];
                 dashboardLayoutTmpl[2]=[];
-                dashboardLayoutTmpl[1][0] = {"fieldLabel":"ВЫБРАТЬ СЮИТУ", "fieldAttribute":"suite-select", "useControl":"dropdown", "disabled":false, "class":"refreshLabel", "value":"", "selectvalues":[]};
+                dashboardLayoutTmpl[1][0] = {"fieldLabel":"ВЫБРАТЬ СЮИТУ", "fieldAttribute":"suite_select", "useControl":"dropdown", "disabled":false, "class":"refreshLabel", "value":"", "selectvalues":[]};
+                dashboardLayoutTmpl[1][0].selectvalues = _.pluck(this.suites, "name");;
                 if(this.isAdmin === true) {
-                dashboardLayoutTmpl[2][0] = {"fieldLabel":"ЗАПИСАТЬ КАК СЮИТУ", "fieldAttribute":"suite-save-name", "useControl":"input", "disabled":false, "class":"refreshLabel", "value":"", "selectvalues":[]};
-                dashboardLayoutTmpl[2][1] = {"fieldLabel":"", "fieldAttribute":"suite-save", "useControl":"toggle", "class":"disableOnWait", "value":false};
+                dashboardLayoutTmpl[2][0] = {"fieldLabel":"ЗАПИСАТЬ КАК СЮИТУ", "fieldAttribute":"suite_save_name", "useControl":"input", "disabled":false, "class":"refreshLabel", "value":"", "selectvalues":[]};
+                dashboardLayoutTmpl[2][1] = {"fieldLabel":"", "fieldAttribute":"suite_save", "useControl":"toggle", "class":"disableOnWait", "value":false};
                 }
                 return dashboardLayoutTmpl
             },
 
             /* normal value - false, change it if you need to debug main form without "authentication" */
-            isLogged: true,
-            isAdmin: true,
+            isLogged: false,
+            isAdmin: false,
 
             ready: function() {
                 /* deep search of elements in light and shadow DOM hierarchy */

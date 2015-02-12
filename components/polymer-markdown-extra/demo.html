@@ -1,0 +1,56 @@
+<!doctype html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <title>markdown-extra Demo</title>
+
+  <script src="../webcomponentsjs/webcomponents.js"></script>
+  <link rel="import" href="markdown-extra.html">
+
+</head>
+<body unresolved>
+
+<h3>Inline Text (taken in part from pagedown-extra's demo)</h3>
+
+<hr>
+
+<markdown-extra>
+
+This is the *first* editor.
+------------------------------
+
+Just plain **Markdown**, except that the input is sanitized:
+
+Here's a footnote![^1]
+
+[^1]: And here's the footnote's actual content...
+
+# Markdown Extra
+
+## Tables
+
+| Item             | Value |
+| ---------------- | -----:|
+| Air Conditioner  | $1600 |
+| <del>Phone</del> |   $12 |
+| *Pipe*           |    $1 |
+
+## Fenced Code Blocks
+
+```javascript
+var foo = "bar";
+```
+- One
+- Two
+- Three
+
+</markdown-extra>
+
+<h3>Text via attribute</h3>
+
+<hr>
+
+<markdown-extra text="header\n==============="></markdown-extra>
+
+</body>
+</html>

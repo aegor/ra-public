@@ -1,0 +1,51 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="markdown-extra-includes.html">
+<!--
+Markdown Extra rendering element.
+
+##### Example
+
+    <markdown-extra>Markdown content goes here.</markdown-extra>
+
+@element markdown-extra
+@blurb Markdown Extra rendering element.
+@status alpha
+
+-->
+<polymer-element name="markdown-extra" attributes="text">
+
+  <template>
+
+    <link rel="stylesheet" href="css/prettify.css" />
+
+    <content></content>
+
+  </template>
+
+  <script>
+
+    Polymer('markdown-extra', {
+
+    text: '',
+    converter: null,
+
+    attached: function() {
+      this.converter = Markdown.getSanitizingConverter();
+      Markdown.Extra.init(this.converter, {
+        extensions: "all",
+        highlighter: "prettify"
+      });
+      if (!this.text) {
+        this.text = this.innerHTML;
+      }
+    },
+
+    textChanged: function () {
+      this.innerHTML = this.converter.makeHtml(this.text);
+    }
+
+  });
+
+  </script>
+
+</polymer-element>
