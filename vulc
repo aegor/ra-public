@@ -1,0 +1,1 @@
+vulcanize vulcanize.html --inline -s  -v -o /home/egor/WebstormProjects/METEOR/RATIONALE/Rationale/public/index.html

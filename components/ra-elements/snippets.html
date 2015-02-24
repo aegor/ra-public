@@ -1,0 +1,11 @@
+<paper-button class="colored" toggle="true" active="{{fieldInfo.dialog}}" >контент</paper-button>
+<template if="{{fieldInfo.dialog}}">
+<div>{{fieldInfo.dialog}}</div>
+    <paper-action-dialog heading="Dialog Title" layered="true" opened="true" backdrop="true">
+<p>Dialog content</p>
+    <ra-form-layout formItems="{{}}" formValues="{{}}"></ra-form-layout>
+    <paper-button dismissive>More Info</paper-button>
+    <paper-button affirmative>Decline</paper-button>
+    <paper-button affirmative>Accept</paper-button>
+</paper-action-dialog>
+</template>

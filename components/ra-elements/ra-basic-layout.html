@@ -14,33 +14,12 @@
 <link rel="import" href="../ra-elements/ra-login-box.html">
 <link rel="import" href="../ra-elements/ra-form-layout.html">
 <link rel="import" href="../ra-elements/ra-crud-buttons.html">
-<link rel="import" href="../ra-elements/ra-dashboard.html">
 
-<polymer-element name="ra-basic-layout" attributes="selectedSub formValues formBuilder dashboardLoad raErrorMessage">
+<polymer-element name="ra-basic-layout" attributes="selectedSub formValues formBuilder dashboardLoad">
     <template>
-<!--        <style>
-            html /deep/ core-collapse {
-                border: 1px solid #ccc;
-                padding: 8px;
-            }
+        <style shim-shadowdom>
 
-            html /deep/ core-overlay {
-                border: 1px solid #ccc;
-                padding: 8px;
-                background: #fff;
-            }
-
-            .constrained-height {
-                height: 150px;
-            }
-
-            .dropdown.colored::shadow #ripple,
-            .dropdown.colored::shadow #background {
-                border: 1px solid #0f9d58;
-                background-color: #b7e1cd;
-            }
-            /* ra-form-layout end css */
-        </style>-->
+        </style>
 
         <template if="{{isLogged}}">
             <core-scaffold>
@@ -99,7 +78,7 @@
                         </template>
                     </template>
                 </template>
-                <paper-toast id="ra_error" text="{{raErrorMessage}}" style="padding-right: 60px;"></paper-toast>
+                <paper-toast id="ra_error" style="padding-right: 60px;"></paper-toast>
             </core-scaffold>
         </template>
         <template if="{{!isLogged}}">
@@ -109,6 +88,9 @@
         </template>
     </template>
     <script>
+        /* Very useful debug filter for debug Polymer expressions
+        *  Example: {{expression | debug([arg]}}
+        * */
         PolymerExpressions.prototype.debug = function(input, arg) {
             var s = "color: blue; font-size: 12px;";
             console.log("%cPOLYMER DEBUG FILTER. Input: " + input +" Argument: " + arg, s)
@@ -214,12 +196,19 @@
                     [
                         {"fieldLabel":"Имя", "fieldAttribute":"name", "useControl":"input", "disabled":false, "class":"refreshLabel", "value":""},
                         {"fieldLabel":"Описание", "fieldAttribute":"title", "useControl":"input", "disabled":false, "class":"refreshLabel", "value":""},
-                        {"fieldLabel":"Соответствия", "fieldAttribute":"pairs", "useControl":"input", "disabled":false, "class":"refreshLabel", "value":""}
                     ]
                 ];
                 suitesLayoutTmpl[0][0].value = su.name;
                 suitesLayoutTmpl[0][1].value = su.title;
-                suitesLayoutTmpl[0][2].value = su.pairs;
+                suitesLayoutTmpl[1]=[];
+
+                for(var i=1; i<su.pairs.length + 1; i++){
+                    suitesLayoutTmpl.push([]);
+                    suitesLayoutTmpl[i].push({"fieldLabel": "", "fieldAttribute": "su_player", "useControl": "item", "disabled": false, "class": "refreshLabel"});
+                    suitesLayoutTmpl[i][0].fieldLabel = "Плеер: " + su.pairs[i-1].player;
+                    suitesLayoutTmpl[i].push({"fieldLabel": "", "fieldAttribute": "su_design", "useControl": "item", "disabled": false, "class": "refreshLabel"});
+                    suitesLayoutTmpl[i][1].fieldLabel = "Дизайн: " + su.pairs[i-1].design;
+                }
                 return suitesLayoutTmpl
             },
 
@@ -250,13 +239,10 @@
             isAdmin: false,
 
             ready: function() {
-                /* deep search of elements in light and shadow DOM hierarchy */
                 var ra = document.querySelector('body /deep/ ra-basic-layout');
                 // dirty hook to initialize menus
                 ra.menuFabric = function() {
-                    /* deep search of element in light and shadow DOM hierarchy */
                     var ra = document.querySelector('body /deep/ ra-basic-layout');
-
                     for (var i in ra.menus) {
                         if (ra[ra.menus[i].name]) {
                             ra.menus[i].content = ra[ra.menus[i].name];
